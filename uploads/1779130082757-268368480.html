@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أيهم أبو شندي | App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --app-bg: #000000;
+            --card-bg: #111111;
+            --primary-gold: #D4AF37;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --nav-bg: rgba(20, 20, 20, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* إخفاء شريط التمرير (Scrollbar) عشان يبين تطبيق حقيقي */
+        ::-webkit-scrollbar { display: none; }
+        
+        body {
+            background-color: #1a1a1a; /* لون خلفية اللابتوب إذا انفتح عليه */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* حاوية التطبيق (شكل شاشة الموبايل) */
+        .app-container {
+            width: 100%;
+            max-width: 480px; /* حجم شاشة موبايل */
+            height: 100vh;
+            background-color: var(--app-bg);
+            position: relative;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            padding-bottom: 90px; /* مساحة للناف بار السفلي */
+        }
+
+        /* الهيدر العلوي */
+        .app-header {
+            padding: 30px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--app-bg);
+            z-index: 10;
+        }
+
+        .user-info h1 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            font-weight: 900;
+        }
+
+        .user-info p {
+            color: var(--primary-gold);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--primary-gold), #8B6508);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #000;
+        }
+
+        /* قسم المحتوى (Widgets) */
+        .section-title {
+            padding: 0 20px;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin: 20px 0 15px;
+            font-weight: 700;
+        }
+
+        /* كروت التطبيق (App Cards) */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .widget-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .widget-card:active { transform: scale(0.95); } /* تأثير الضغط زي التطبيقات */
+
+        .widget-card i {
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+            margin-bottom: 10px;
+        }
+
+        .widget-card h3 {
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .widget-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* كرت عريض */
+        .widget-wide {
+            grid-column: span 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .widget-wide .info { flex: 1; }
+
+        /* المشاريع (سكرول أفقي زي ستوريات الانستغرام) */
+        .horizontal-scroll {
+            display: flex;
+            gap: 15px;
+            padding: 0 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+        }
+
+        .project-card {
+            min-width: 260px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            scroll-snap-align: start;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .project-card h4 {
+            color: var(--text-main);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .project-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .project-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 12px;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* شريط التنقل السفلي (Bottom Nav) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            height: 80px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px 30px 0 0;
+            padding-bottom: 10px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .nav-item i { font-size: 1.4rem; }
+        
+        .nav-item.active { color: var(--primary-gold); }
+
+        /* صفحات التطبيق (للتنقل الوهمي) */
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* زر التواصل السريع */
+        .call-btn {
+            background: linear-gradient(45deg, var(--primary-gold), #8B6508);
+            color: #000;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            width: calc(100% - 40px);
+            margin: 30px 20px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="user-info">
+                <p>مرحباً بك في عالم</p>
+                <h1>أيهم أبو شندي</h1>
+            </div>
+            <div class="profile-pic">
+                <i class="fa-solid fa-code"></i>
+            </div>
+        </header>
+
+        <div id="home-tab" class="tab-content active">
+            
+            <h2 class="section-title">نظرة عامة</h2>
+            <div class="widget-grid">
+                <div class="widget-card widget-wide">
+                    <div class="info">
+                        <h3>طالب MIS - الجامعة الهاشمية</h3>
+                        <p>أجمع بين الفهم الإداري للأعمال والقدرة التقنية على بناء أنظمة متكاملة.</p>
+                    </div>
+                    <i class="fa-solid fa-graduation-cap" style="font-size: 2.5rem; margin:0;"></i>
+                </div>
+
+                <div class="widget-card">
+                    <i class="fa-solid fa-laptop-code"></i>
+                    <h3>تطوير ويب</h3>
+                    <p>برمجة مواقع وتطبيقات</p>
+                </div>
+
+                <div class="widget-card">
+                    <i class="fa-solid fa-database"></i>
+                    <h3>تحليل بيانات</h3>
+                    <p>C++, Java, Data Struct</p>
+                </div>
+            </div>
+
+            <h2 class="section-title">أحدث المشاريع (اسحب لليمين)</h2>
+            <div class="horizontal-scroll">
+                <div class="project-card">
+                    <h4>منصة إنجاز (Enjaz)</h4>
+                    <p>منصة خدمية متكاملة مصممة لتسهيل الحياة الأكاديمية لطلاب الجامعة.</p>
+                    <span class="project-tag">Education</span>
+                </div>
+                <div class="project-card">
+                    <h4>SPEED للتوصيل</h4>
+                    <p>نظام إلكتروني حديث لإدارة خدمات التوصيل السريع بكفاءة عالية.</p>
+                    <span class="project-tag">Logistics</span>
+                </div>
+                <div class="project-card">
+                    <h4>سوق الخالدية والضليل</h4>
+                    <p>منصة تجارية إلكترونية بتجمع أبناء المنطقة لتجربة تسوق متكاملة.</p>
+                    <span class="project-tag">E-Commerce</span>
+                </div>
+            </div>
+
+            <a href="https://wa.me/962780965592" class="call-btn">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1.5rem;"></i>
+                تواصل معي الآن
+            </a>
+        </div>
+
+        <div id="services-tab" class="tab-content">
+            <h2 class="section-title">خدماتي التقنية</h2>
+            <div class="widget-grid">
+                <div class="widget-card widget-wide">
+                    <i class="fa-solid fa-store"></i>
+                    <h3>المتاجر الإلكترونية</h3>
+                    <p>بناء متاجر متكاملة زي "أيهم موبايل" مع لوحة تحكم كاملة لإدارة المنتجات والطلبات.</p>
+                </div>
+                <div class="widget-card widget-wide">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h3>أنظمة الإدارة (MIS)</h3>
+                    <p>تصميم أنظمة بتسهل شغل الشركات والمؤسسات بناءً على تحليل دقيق للبيانات.</p>
+                </div>
+                <div class="widget-card widget-wide">
+                    <i class="fa-solid fa-certificate"></i>
+                    <h3>تدريب واستشارات</h3>
+                    <p>حاصل على شهادات TOT و Advanced Excel، وجاهز لتقديم استشارات تقنية.</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="switchTab('home-tab', this)">
+                <i class="fa-solid fa-house"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('services-tab', this)">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>خدماتي</span>
+            </a>
+            <a href="https://wa.me/962780965592" class="nav-item">
+                <i class="fa-solid fa-phone"></i>
+                <span>تواصل</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <script>
+        function switchTab(tabId, element) {
+            // إخفاء كل الصفحات
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // إزالة اللون الذهبي من كل الأزرار
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+
+            // إظهار الصفحة المطلوبة وتلوين الزر المكبوس
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
